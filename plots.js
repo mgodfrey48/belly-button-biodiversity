@@ -95,6 +95,43 @@ function populateDemographics(sampleID) {
     });
 }
 
+function drawGauge(sampleID) {
+    console.log(`Draw gauge for ${sampleID}`);
+
+    d3.json("samples.json").then(data => {
+        let metadata = data.metadata;
+        let resultArray = metadata.filter(s => s.id === parseInt(sampleID));
+        let result = resultArray[0];
+
+        let gaugeData = {
+                domain: { x: [0, 9], y: [0, 9]},
+                value: result.wfreq,
+                title: { text: "Belly Button Washes Per Week" },
+                subtitle: "Scrubadubdub",
+                type: "indicator",
+                mode: "gauge+number",
+                gauge: {
+                    axis: { range: [null, 9] },
+                    steps: [
+                      { range: [0, 1], color: "#e6faff" },
+                      { range: [1, 2], color: "#ccf5ff" },
+                      { range: [2, 3], color: "#b3f0ff" },
+                      { range: [3, 4], color: "#99ebff" },
+                      { range: [4, 5], color: "#80e5ff" },
+                      { range: [5, 6], color: "#66e0ff" },
+                      { range: [6, 7], color: "#4ddbff" },
+                      { range: [7, 8], color: "#33d6ff" },
+                      { range: [8, 9], color: "#1ad1ff"}
+                    ],
+                }
+            };
+
+        let gaugeTrace = [gaugeData]
+        let layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+        Plotly.newPlot('gauge', gaugeTrace, layout);
+    });
+}
+
 // Event handler
 function optionChanged(id) {
     console.log(`optionChanged(${id})`);
@@ -105,6 +142,8 @@ function optionChanged(id) {
     drawBarchart(id);
     // Display the bubble chart
     drawBubblechart(id);
+    // Display the gauge
+    drawGauge(id);
 }
 
 // Initialize the dashboard
@@ -127,6 +166,7 @@ function InitDashboard() {
         populateDemographics(sampleID);
         drawBarchart(sampleID);
         drawBubblechart(sampleID);
+        drawGauge(sampleID);
     });
 }
 

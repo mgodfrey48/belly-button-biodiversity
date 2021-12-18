@@ -163,6 +163,7 @@ function InitDashboard() {
 
         let sampleID = sampleNames[0];
 
+        // Populate the demographics table and draw the charts
         populateDemographics(sampleID);
         drawBarchart(sampleID);
         drawBubblechart(sampleID);

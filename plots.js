@@ -11,13 +11,10 @@ function drawBarchart(sampleID) {
         let samples = data.samples;
         let resultArray = samples.filter(s => s.id === sampleID);
         let result = resultArray[0];
-        console.log(result);
 
         let otu_ids = result.otu_ids;
         let otu_labels = result.otu_labels;
         let sample_values = result.sample_values;
-
-        console.log(sample_values)
 
         let yticks = otu_ids.slice(0,10).map(otuID => `OTU${otuID}`).reverse();
         let barData = {
@@ -42,11 +39,60 @@ function drawBarchart(sampleID) {
 // Function to draw the bubble chart
 function drawBubblechart(sampleID) {
     console.log(`DrawBubblechart(${sampleID})`);
+
+    d3.json("samples.json").then(data => {
+
+        let samples = data.samples;
+        let resultArray = samples.filter(s => s.id === sampleID);
+        let result = resultArray[0];
+
+        let otu_ids = result.otu_ids;
+        let otu_labels = result.otu_labels;
+        let sample_values = result.sample_values;
+        
+        let bubbleData = {
+            x: otu_ids,
+            y: sample_values,
+            mode: "markers",
+            marker: {
+                size: sample_values,
+                color: otu_ids
+            },
+            text: otu_labels 
+        };
+
+        let bubbleTrace = [bubbleData];
+
+        let bubbleLayout = {
+            title: "Sample Counts",
+            xaxis: {
+                title: "OTU ID"
+            }
+        }
+        Plotly.newPlot("bubble", bubbleTrace, bubbleLayout);
+    });
 }
 
 // Function to populate the demographic info
 function populateDemographics(sampleID) {
-    console.log(`Showing demographic data ${sampleID}`);
+    console.log(`Showing demographic data for sample ${sampleID}`);
+
+    d3.json("samples.json").then(data => {
+        
+        let metadata = data.metadata;
+        let resultArray = metadata.filter(s => s.id === parseInt(sampleID));
+        let result = resultArray[0];
+
+        // Clear the html for the current panel to be replaced with new sample info
+        let panel = d3.select("#sample-metadata");
+        panel.html("")
+
+        // Append a h6 tag in the panel for each [key, value] pairing
+        Object.entries(result).forEach(([key, value]) => {
+            let listItem = panel.append("h6");
+            listItem.text(`${key}: ${value}`);
+        });
+    });
 }
 
 // Event handler
@@ -82,7 +128,6 @@ function InitDashboard() {
         drawBarchart(sampleID);
         drawBubblechart(sampleID);
     });
-
 }
 
 InitDashboard();
